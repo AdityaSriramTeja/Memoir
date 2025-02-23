@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from pydantic import BaseModel
 from spacy.lang.en import English
 from sentence_transformers import SentenceTransformer
 from umap import UMAP
@@ -11,6 +13,8 @@ from bertopic import BERTopic
 import json
 import requests
 import re
+import models
+from database import engine, SessionLocal
 
 load_dotenv()
 
@@ -20,6 +24,24 @@ HOST = os.getenv("host")
 PORT = os.getenv("port")
 DBNAME = os.getenv("dbname")
 API_KEY = os.getenv("API_KEY")
+
+app = FastAPI()
+
+# IF YOU MODIFY TABLES, DROP ALL TABLES FIRST
+# models.Base.metadata.drop_all(bind=engine)
+
+# creates tables and cols in database
+models.Base.metadata.create_all(bind=engine, checkfirst=True)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+class TextInput(BaseModel):
+    text: str
 
 def initialize_nlp_pipeline():
     nlp = English()
