@@ -43,6 +43,7 @@ sources_df["y"] = ((sources_df["y"] - min_val) / (val_range) * 180 / 2) - 90 / 2
 
 df = {
     "Topic": sources_df["topic"],
+    "Url": sources_df["url"],
     "geometry": gpd.points_from_xy(sources_df["x"], sources_df["y"]),
     # "geometry": [Point(-87.789, 41.976)],
 }
@@ -74,7 +75,8 @@ convex_gdf["geometry"] = convex_gdf["geometry"].apply(compute_convex_hulls)
 # gdf.plot(ax=bp, color="red")
 # plt.show()
 
-gdf.to_crs(epsg=4326).to_file("output.geojson", driver="GeoJSON")
+gdf.to_crs(epsg=4326).to_file("points.geojson", driver="GeoJSON")
+convex_gdf.to_crs(epsg=4326).to_file("convex.geojson", driver="GeoJSON")
 
 m = convex_gdf.explore(
     # tiles="OpenStreetMap",

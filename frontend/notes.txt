@@ -13,4 +13,6 @@
 - Urls to points
 - Search bar
 
+- Dynamic text size based on zoom level
 - Deal with multiple parent layers (nested, grandparent, etc)
+- Consolidate websites/source from chunks

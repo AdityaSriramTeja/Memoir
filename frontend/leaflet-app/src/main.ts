@@ -67,7 +67,12 @@ const convexLayer = L.geoJSON(data, {
       marker.addTo(map);
 
       const polygon = L.geoJSON(feature, {
-        style: { color: stc(featureTopic), fillOpacity: 0.5, opacity: 1 },
+        style: {
+          color: stc(featureTopic),
+          fillOpacity: 0.5,
+          opacity: 1,
+          weight: 2,
+        },
         // onEachFeature: (feature, layer) => {
         // layer.on("mousemove", (e: L.LeafletMouseEvent) => {
         //   const target = e.target;
@@ -101,7 +106,12 @@ const convexLayer = L.geoJSON(data, {
       });
 
       const polygon = L.geoJSON(feature, {
-        style: { color: stc(featureTopic), fillOpacity: 0.5, opacity: 1 },
+        style: {
+          color: stc(featureTopic),
+          fillOpacity: 0.5,
+          opacity: 1,
+          weight: 2,
+        },
       });
       topicGroup.polygons.push(polygon);
       polygon.addTo(map);
@@ -127,29 +137,48 @@ const res1 = await fetchGeoJson("points");
 const data1 = await res1.json();
 const pointsLayer = L.geoJSON(data1, {
   onEachFeature: function (feature, layer) {
-    if (feature.properties?.Topic) {
-      layer.bindTooltip(feature.properties.Topic, {
-        permanent: true,
-        direction: "top",
-      });
-    }
+    // const featureType = feature.geometry.type;
+    // const featureTopic = feature.properties?.Topic;
+
+    // // Create topic in groups if not exists
+    // if (!groups[featureTopic]) {
+    //   groups[featureTopic] = { markers: [], points: [], polygons: [] };
+    // }
+    // const topicGroup = groups[featureTopic];
+
+    // if (featureType === "Point") {
+
+    // }
+
+    if (!feature.properties?.Url) return;
+
+    layer.bindTooltip(feature.properties.Url, {
+      // permanent: true,
+      direction: "top",
+    });
   },
 });
 // pointsLayer.addTo(map);
 
 map.on("zoomend", function () {
-  const zoomedIn = map.getZoom() > 7;
+  const pointsZoomedIn = map.getZoom() > 7;
   const textZoomedIn = map.getZoom() > 4;
+
+  if (pointsZoomedIn) {
+    pointsLayer.addTo(map);
+  } else {
+    pointsLayer.removeFrom(map);
+  }
 
   Object.keys(groups).forEach((topicName) => {
     const topic = groups[topicName];
     topic.markers.forEach((layer: L.Marker) => {
-      layer.setOpacity(textZoomedIn ? (zoomedIn ? 0.3 : 1) : 0);
+      layer.setOpacity(textZoomedIn ? (pointsZoomedIn ? 0.3 : 1) : 0);
     });
     topic.polygons.forEach((layer: L.GeoJSON) => {
       layer.setStyle({
-        opacity: zoomedIn ? 0.3 : 1,
-        fillOpacity: zoomedIn ? 0.1 : 0.5,
+        opacity: pointsZoomedIn ? 0.3 : 1,
+        fillOpacity: pointsZoomedIn ? 0.1 : 0.5,
       });
     });
   });
