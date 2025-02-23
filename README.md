@@ -46,7 +46,8 @@ Memoir allows users to add any content they have consumed to a dynamic, evolving
 ### Technologies Used
 
 -   **AI & NLP:** BERTopic for topic modeling and Gemini for organizing topics into a hierarchical structure
--   **Frontend:** React for an interactive Chrome extension
+- **Frontend:**  Chrome extension, Chatbot with ReactJs.
+- **Graph:** GIS -> GeoPandas, Leaflet.js, EPSG Projection, Shapely
 -   **Backend:** Python (FastAPI) for efficient processing
 -   **Database:** pgvector for semantic search and contextual recall using vector embeddings
 
