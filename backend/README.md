@@ -47,4 +47,32 @@
     deactivate
     ```
 
-steps to create and initilize a python venv
+## Steps to Run This Project
+
+1. **Install Packages**:
+
+    - Navigate to the [backend](http://_vscodecontentref_/0) folder.
+    - Install the required packages from the `requirements.txt` file:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+2. **Delete Database Tables**:
+
+    - Run `api_test.py` from the `src` folder to delete the database tables:
+
+    ```bash
+    python src/api_test.py
+    ```
+
+3. **Start the Application**:
+
+    - Run `main.py` using `uvicorn` from the `src` folder:
+
+    ```bash
+    uvicorn src.main:app --reload
+    ```
+
+4. **Re-create Tables**:
+    - If `api_test.py` is executed, you will need to re-run `main.py` to re-create the tables.
