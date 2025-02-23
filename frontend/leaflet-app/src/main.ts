@@ -54,9 +54,10 @@ const convexLayer = L.geoJSON(data, {
       const textIcon = L.divIcon({
         className: "topic-text-container",
         // html: feature.properties.Topic,
-        html: `<b class="topic-text" style="color: ${stc(featureTopic)};">${
-          feature.properties.Topic
-        }</b>`,
+        // html: `<b class="topic-text" style="color: ${stc(featureTopic)};">${
+        //   feature.properties.Topic
+        // }</b>`,
+        html: `<b class="topic-text">${feature.properties.Topic}</b>`,
         iconSize: [0, 0], // No default marker size
         iconAnchor: [0, 0],
       });
@@ -91,10 +92,12 @@ const convexLayer = L.geoJSON(data, {
         const textIcon = L.divIcon({
           className: "topic-text-container",
           // html: feature.properties.Topic,
+          // html: `<b class="topic-text
+          // " style="color: ${stc(featureTopic)};">${
+          //   feature.properties.Topic
+          // }</b>`,
           html: `<b class="topic-text
-          " style="color: ${stc(featureTopic)};">${
-            feature.properties.Topic
-          }</b>`,
+          " >${feature.properties.Topic}</b>`,
           iconSize: [0, 0], // No default marker size
           iconAnchor: [0, 0],
         });
