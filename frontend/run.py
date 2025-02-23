@@ -4,8 +4,9 @@ import numpy as np
 import geopandas as gpd
 from shapely import MultiPolygon
 from shapely.geometry import Point, LineString, Polygon
-import fiona
-import folium
+
+# import fiona
+# import folium
 import matplotlib.pyplot as plt
 
 plt.style.use("bmh")
