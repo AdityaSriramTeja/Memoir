@@ -19,25 +19,6 @@ function parseURL(url) {
     return {type:"unknown"};
 }
 
-function getSourceHTML() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.scripting.executeScript(
-            {
-                target: { tabId: tabs[0].id },
-                function: () => {
-                    return document.documentElement.outerHTML;
-                }
-            },
-            (results) => {
-                if (results && results[0]) {
-                    console.log("Page Source:", results[0].result);
-                    //console.log("Retrieved page source");
-                }
-            }
-        );
-    });
-}
-
 async function trigger_fetch() {
     // Get the URL
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -162,6 +143,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "addToMindmap") {
         const query = info.selectionText;
         console.log("Selected text:", query);
+        console.log("URL: " + tab.url);
+        console.log("Parsed URL:", parseURL(tab.url));
+        // Send the data to the backend
+        const payload = {
+            content: {
+                text: query
+            },
+            url: {
+                text: tab.url
+            },
+            page_type: {
+                text: parseURL(tab.url).type
+            }
+        }
+        sendData(payload);
+        // Send notification
         sendOverlayNotification("Added selected text to Mindmap")
     }
 });
