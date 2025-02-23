@@ -1,0 +1,16 @@
+- Use Convex Hulls (in Geopandas intro guide) / Merge Polygons in PyGIS to compute cities, states, and countries (groups)
+- Potential: Use buffers to compute intersecting points (close points)
+- Customize on which zoom levels should each of the elements be displayed
+- All rendering should be done in Leaflet.js (frontend), backend is only responsible for generating GeoJSON (with all the recursively compiled metadata like topics and subtopics)
+- Color differently
+
+- To deal with multiple parents:- Write algo to find closest common parent
+- Afterwards, think about Icons
+
+- Hover highlights all polygons of the same group
+- Label on blobs (maybe only start labelling after a certain zoom level)
+- Refresh on `npm run dev`
+- Urls to points
+- Search bar
+
+- Deal with multiple parent layers (nested, grandparent, etc)

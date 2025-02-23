@@ -1,0 +1,18 @@
+#app {
+  height: 100vh;
+}
+
+#map {
+  height: 100%;
+}
+
+.topic-text-container {
+  position: absolute;
+  opacity: 0;
+}
+
+.topic-text {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
