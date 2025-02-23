@@ -164,7 +164,7 @@ const pointsLayer = L.geoJSON(data1, {
 // pointsLayer.addTo(map);
 
 map.on("zoomend", function () {
-  const pointsZoomedIn = map.getZoom() > 7;
+  const pointsZoomedIn = map.getZoom() > 6;
   const textZoomedIn = map.getZoom() > 4;
 
   if (pointsZoomedIn) {
