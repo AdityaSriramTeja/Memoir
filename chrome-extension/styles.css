@@ -1,0 +1,39 @@
+#title {
+  color: red;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  width: 300px;
+  padding: 10px;
+}
+#mindmap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.node {
+  padding: 5px;
+  background: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+button {
+  background: #fff;
+  color: black;
+  border: 2px solid #7d7d7d;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+button:hover {
+  background: #d3d3d3;
+}

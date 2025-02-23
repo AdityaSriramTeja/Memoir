@@ -1,0 +1,40 @@
+{
+  "name": "Mindmap Extension",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "A simple mind mapping Chrome extension",
+  "permissions": ["activeTab", "scripting", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+       "default_popup": "popup.html"
+   },
+  "commands": {
+    "trigger_fetch": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+I"
+      },
+      "description": "Trigger fetch request"
+    }
+  },
+  "icons": {
+   "16": "icon16.png",
+   "32": "icon32.png",
+   "96": "icon96.png"
+  },
+  "web_accessible_resources": [
+   {
+      "resources": ["icon96.png"],
+      "matches": ["<all_urls>"]
+   }
+  ]
+}
