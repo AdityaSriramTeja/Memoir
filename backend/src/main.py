@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from spacy.lang.en import English
 from sentence_transformers import SentenceTransformer
 from umap import UMAP
@@ -9,6 +11,15 @@ from bertopic import BERTopic
 import json
 import requests
 import re
+
+load_dotenv()
+
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
+API_KEY = os.getenv("API_KEY")
 
 def initialize_nlp_pipeline():
     nlp = English()

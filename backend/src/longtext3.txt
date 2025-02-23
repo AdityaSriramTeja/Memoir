@@ -1,0 +1,84 @@
+What is ngrok
+Ngrok is a cross-platform application that creates secure tunnels (paths) to localhost machine. It enables developers to expose a local development server to the Internet with minimal effort. The software makes your locally-hosted web server (like computer, laptop, rasbery PI) appear to be hosted on a subdomain of ngrok.com, meaning that no public IP or domain name on the local machine is needed.
+
+Ngrok alternatives
+Similar functionality can be achieved with Reverse SSH Tunneling, but this requires more setup as well as hosting of your own remote server.
+
+For more info check: full list of Ngrok alternatives
+
+Ngrok pricing
+Ngrok has a free pricing tier for developers who are bringing new projects to life. The downside to the free tier is the lack of custom domain support.
+
+How does ngrok work?
+ngrok is able to bypass NAT Mapping and firewall restrictions by creating a long-lived TCP tunnel from a randomly generated subdomain on ngrok.com (e.g. 3gf892ks.ngrok.com) to the local machine.
+
+After specifying the port that your web server listens on, the ngrok client program initiates a secure connection to the ngrok server and then anyone can make requests to your local server with the unique ngrok tunnel address. The ngrok developer's guide contains more detailed information on how it works.
+
+What is ngrok tunneling?
+Various tunnel or paths to servers are available around the world, locations include: US (Ohio), Europe (Frankfurt), Asia (Singapore), and Australia (Sydney). Alternatively, the ngrok server software can be self-hosted on a VPS or dedicated server.
+
+How to use ngrok?
+By default, ngrok creates both HTTP and HTTPS endpoints, making it useful for testing integrations with third-party services or APIs that require valid SSL/TLS domains. Other use cases include: quickly showcasing local demos to clients, testing mobile application backends, and running personal cloud services from your home PC.
+
+One praised feature of ngrok is the ability to track and replay HTTP requests via ngrok's web console . The replay functionality is highly useful when testing API calls or webhooks as one can easily inspect all header content and request/response data in one place via the console UI.
+
+A premium version of ngrok, ngrok link, is available for developers to use in production and offers features such as API automation and credential management, making it suitable for remote IoT management in a professional setting.
+
+ngrok installation
+Sign up for an account: Before installing Ngrok, you'll need to sign up for an account on the Ngrok website, and create an account.
+
+Download Ngrok: After signing up, log in to your Ngrok account and navigate to the "Download" section. Here, you'll find the download links for various platforms. Choose the appropriate version for your operating system (Windows, macOS, Linux) and download the Ngrok binary.
+
+Extract the Ngrok binary: Once the download is complete, extract the Ngrok binary from the downloaded archive.
+
+Move Ngrok to a directory in your PATH: After extracting the Ngrok binary, move it to a directory that is included in your system's PATH environment variable. This will allow you to run Ngrok from any directory on your system. For example, on Linux or macOS, you can move the Ngrok binary to /usr/local/bin. On Windows, you can move it to a directory like C:\Windows\System32.
+
+Authenticate Ngrok: To use Ngrok, you'll need to authenticate it using your Ngrok auth token. Open a terminal or command prompt and run the following command, replacing your-auth-token with the auth token you obtained from the Ngrok website:
+
+Copy codengrok authtoken your-auth-token
+
+Start using Ngrok: With Ngrok installed and authenticated, you can start using it to create tunnels to your local servers. Simply run the ngrok command followed by the desired options and the port number of the local server you want to expose. For example:
+
+Copy codengrok http 80
+
+This command would create an HTTP tunnel to a local server running on port 80.
+
+That's it! You should now have Ngrok installed and ready to use on your local system.
+
+Is Ngrok secured?
+Ngrok is a highly secure platform for remote access and is safe to use. Ngrok provides tunneling, as mentioned above, which enables users to access local-hosted servers from outside the machine. Ngrok security is based on encryption and control features, but its absolute level of security ultimately depends on how it is configured and used.
+
+Encryption: Ngrok tunnels use TLS/SSL encryption, which ensures that data transmitted between the local machine and the Ngrok server is secure.
+
+Authentication: Ngrok provides authentication mechanisms, including token-based authentication, to ensure that only authorized users can access the tunnels.
+
+Access Control: Ngrok offers features to control access to tunnels, such as whitelisting IP addresses or requiring authentication tokens, which adds an extra layer of security.
+
+Tunnel Visibility: By default, Ngrok provides a randomly generated subdomain for each tunnel, which enhances security by making it harder for unauthorized users to discover and access the tunnel.
+
+Logging and Monitoring: Ngrok provides logging and monitoring features that allow users to track tunnel usage and detect any suspicious activity.
+
+However, it's essential to keep in mind that no system is entirely secure, and the security of Ngrok tunnels can be compromised if not configured correctly or if used improperly. For example, sharing Ngrok tunnel URLs publicly, or using weak authentication mechanisms can pose security risks.
+
+Therefore, it's crucial to follow best practices for securing Ngrok tunnels, such as:
+
+Using strong authentication tokens.
+
+Restricting access to tunnels to only trusted users or IP addresses.
+
+Monitoring tunnel activity for any signs of unauthorized access.
+
+Keeping Ngrok and its dependencies up to date to patch any security vulnerabilities.
+
+Overall, while Ngrok provides advanced security features, users must take appropriate measures to configure and use it securely for their specific use cases.
+
+What is ngrok authtoken?
+The auth token is essentially a unique identifier tied to use its features. It's important to keep your auth token secure, as it provides access to your Ngrok account and services associated with it.
+
+Do hackers use ngrok?
+Ngrok is regularly abused by hackers for cyber attacks. Hackers choose ngrok because of its capabilities and reputation to maneuver while bypassing security protocols. They will see this as a way to complete a phishing attack, as they are able to create fake login pages or deliver malicious URLs.
+
+Resources
+Http Stream and Http Data
+
+Http 3 Info
