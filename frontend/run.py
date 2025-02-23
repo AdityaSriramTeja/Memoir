@@ -75,8 +75,12 @@ convex_gdf["geometry"] = convex_gdf["geometry"].apply(compute_convex_hulls)
 # gdf.plot(ax=bp, color="red")
 # plt.show()
 
-gdf.to_crs(epsg=4326).to_file("points.geojson", driver="GeoJSON")
-convex_gdf.to_crs(epsg=4326).to_file("convex.geojson", driver="GeoJSON")
+gdf.to_crs(epsg=4326).to_file(
+    "leaflet-app/public/geojson/points.geojson", driver="GeoJSON"
+)
+convex_gdf.to_crs(epsg=4326).to_file(
+    "leaflet-app/public/geojson/convex.geojson", driver="GeoJSON"
+)
 
 m = convex_gdf.explore(
     # tiles="OpenStreetMap",
