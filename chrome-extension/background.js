@@ -110,7 +110,7 @@ async function trigger_fetch() {
 
 function sendData(data) {
     console.log("Sending data to backend:", data);
-    fetch("https://dce2-2607-fea8-e362-a500-40f6-a651-7636-8608.ngrok-free.app/process_text",{
+    fetch("http://localhost:8000/process_text",{
         method: "POST",
         headers: {
             "Content-Type": "application/json"

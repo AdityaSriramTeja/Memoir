@@ -27,3 +27,11 @@ class Sources(Base):
     url = Column(String, nullable=True)
     page_type = Column(String, index=True)
     content = Column(String)
+
+class Websites(Base):
+    __tablename__ = "websites"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    url = Column(String, index=True, unique=True)
+    content = Column(String, index=True)
+    page_type = Column(String, index=True)

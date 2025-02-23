@@ -1,20 +1,23 @@
+from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from spacy.lang.en import English
 from sentence_transformers import SentenceTransformer
 from umap import UMAP
 from hdbscan import HDBSCAN
 from sklearn.feature_extraction.text import TfidfVectorizer
-from bertopic.representation import MaximumMarginalRelevance
-from bertopic.vectorizers import ClassTfidfTransformer
 from bertopic import BERTopic
+from bertopic.representation import MaximalMarginalRelevance
+from bertopic.vectorizers import ClassTfidfTransformer
 import json
 import requests
 import re
 import models
 from database import engine, SessionLocal
+from sqlalchemy.orm import Session
+
 
 load_dotenv()
 
@@ -54,7 +57,7 @@ def initialize_models():
     umap_model = UMAP(n_neighbors=3, n_components=2, min_dist=0.0, metric='cosine', random_state=42)
     hdbscan_model = HDBSCAN(min_cluster_size=2, metric='euclidean', cluster_selection_method='eom', prediction_data=True)
     vectorizer_model = TfidfVectorizer(stop_words='english', ngram_range=(1, 2))
-    representation_model = MaximumMarginalRelevance(diversity=0.4)
+    representation_model = MaximalMarginalRelevance(diversity=0.4)
     ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
 
     topic_model = BERTopic(
@@ -188,3 +191,67 @@ def generate_keywords_and_topic_identity(formatted_list):
             keywords.add(temp[idx])
         identity[i] = temp[-2]
     return keywords, identity, keywords_layer
+
+@app.get("/get_articles")
+async def get_articles(text: str, db: Session = Depends(get_db)):
+    return "FIX THIS"
+
+@app.get("/get_topic_graph")
+async def get_topic_graph(query_topic: str, db: Session = Depends(get_db)):
+    return "FIX THIS"
+
+@app.post("/process_text")
+async def process_text(content: TextInput, url: TextInput, page_type: TextInput, db: Session = Depends(get_db)):
+    content.text = content.text.replace("\n", " ").strip()
+    content.text = content.text.replace("\\", " ").strip()
+
+    # use bs4 to get all the text from content
+    soup = BeautifulSoup(content.text, 'html.parser')
+    if page_type.text == "chatgpt":
+        # Find all agent turns and join their text with spaces
+        agent_turns = soup.find_all("div", class_="agent-turn")
+        content.text = ' '.join(turn.get_text() for turn in agent_turns) if agent_turns else soup.get_text()
+    else:
+        content.text = soup.get_text()
+
+    # filter all non-alphanumeric characters
+    content.text = re.sub(r'[^A-Za-z0-9(),./;:\'"\[\]{}_-]', ' ', content.text)
+   
+    print("content.text:", content.text)
+    return "FIX THIS"
+
+@app.get("/choosing_endpoint")
+async def choosing_endpoint(user_question: str = None, db: Session = Depends(get_db)):
+    return "FIX THIS"
+
+@app.get("/get_all_topics")
+async def get_all_topics(db: Session = Depends(get_db)):
+    db_topics = db.query(models.Topics).all()
+    return db_topics
+
+@app.get("/get_all_connections")
+async def get_all_connections(db: Session = Depends(get_db)):
+    db_connections = db.query(models.Connections).all()
+    return db_connections
+
+@app.get("/get_all_sources")
+async def get_all_sources(db: Session = Depends(get_db)):
+    db_sources = db.query(models.Sources).all()
+    # Convert SQLAlchemy objects to dictionaries and remove the 768d vector
+    data = []
+    for source in db_sources:
+        source_dict = {
+            "id": source.id, 
+            "topic_id": source.topic_id, 
+            "vector_2d": source.vector_2d.tolist() if hasattr(source.vector_2d, 'tolist') else source.vector_2d, 
+            "url": source.url, 
+            "page_type": source.page_type, 
+            "content": source.content
+        }
+        data.append(source_dict)
+    return data
+
+@app.get("/get_all_websites")
+async def get_all_websites(db: Session = Depends(get_db)):
+    db_websites = db.query(models.Websites).all()
+    return db_websites

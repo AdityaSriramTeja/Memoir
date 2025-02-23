@@ -4,3 +4,18 @@ umap-learn
 scikit-learn
 hdbscan
 spacy
+bs4
+python-dotenv
+# dotenv
+fastapi
+sqlalchemy
+uvicorn
+pydantic
+pgvector
+tf-keras
+datasets
+vecs
+setuptools
+wheel
+psycopg2
+psycopg2-binary
