@@ -6,7 +6,7 @@ hdbscan
 spacy
 bs4
 python-dotenv
-# dotenv
+dotenv
 fastapi
 sqlalchemy
 uvicorn

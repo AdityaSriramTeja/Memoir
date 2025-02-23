@@ -11,8 +11,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from bertopic import BERTopic
 from bertopic.representation import MaximalMarginalRelevance
 from bertopic.vectorizers import ClassTfidfTransformer
+from bertopic import BERTopic
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select
 import json
 import requests
+import numpy as np
 import re
 import models
 from database import engine, SessionLocal
@@ -192,13 +196,69 @@ def generate_keywords_and_topic_identity(formatted_list):
         identity[i] = temp[-2]
     return keywords, identity, keywords_layer
 
-@app.get("/get_articles")
-async def get_articles(text: str, db: Session = Depends(get_db)):
-    return "FIX THIS"
 
-@app.get("/get_topic_graph")
-async def get_topic_graph(query_topic: str, db: Session = Depends(get_db)):
-    return "FIX THIS"
+
+def store_topics_in_db(db, topic_keywords, all_topic_names):
+    for topic in topic_keywords:
+        if topic not in all_topic_names:
+            db_topic = models.Topics(name=topic)
+            db.add(db_topic)
+            db.commit()
+            db.refresh(db_topic)
+
+def store_connections_in_db(db, keywords_layer, all_topic_names, all_topics):
+
+    for layer in keywords_layer:
+        for source_idx in range(len(layer)-1):
+            target_idx = source_idx + 1
+            if (layer[source_idx] not in all_topic_names or layer[target_idx] not in all_topic_names):
+                continue
+
+            query_source = [topic for topic in all_topics if topic.name == layer[source_idx]][0]
+            query_target = [topic for topic in all_topics if topic.name == layer[target_idx]][0]
+
+            insert_stmt = insert(models.Connections).values(source_topic=query_source.id, target_topic=query_target.id)
+            do_nothing_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['source_topic', 'target_topic'])
+            db.execute(do_nothing_stmt)
+
+def store_sources_in_db(db, documents, topics, embeddings, reduced_embeddings, identity, url, page_type):
+    data = []
+    for doc, topic, embedding, vector_2d in zip(documents, topics, embeddings, reduced_embeddings):
+        if topic == -1 or topic not in identity:
+            continue
+
+        data.append({"Document": doc, "Assigned Topic": identity[topic]})
+
+        queried_topic = db.query(models.Topics).filter(models.Topics.name == identity[topic]).first()
+
+        new_sources = models.Sources(topic_id=queried_topic.id, vector_2d=vector_2d, vector_768d=embedding, url=url, page_type=page_type, content=doc)
+        db.add(new_sources)
+        db.commit()
+        db.refresh(new_sources)
+    return data
+
+def split_into_chunks(sentences, slice_size) -> list[list[str]]:
+    return [sentences[i:i + slice_size] for i in range(0, len(sentences), slice_size)]
+
+
+@app.get("/get_relevant_articles")
+async def get_articles(text: str, db: Session = Depends(get_db)):
+    embedding_model = SentenceTransformer("all-mpnet-base-v2")
+    embedding = embedding_model.encode([text])[0]
+    similar_document = db.scalars(select(models.Sources).order_by(models.Sources.vector_768d.cosine_distance(embedding)).limit(5))
+    documents = []
+    for document in similar_document:
+        documents.append({
+            "content": document.content,
+            "url": document.url,
+            "page_type": document.page_type,
+            "vector_2d": document.vector_2d.tolist() if isinstance(document.vector_2d, np.ndarray) else document.vector_2d
+        })
+    return documents
+
+# @app.get("/get_topic_graph")
+# async def get_topic_graph(query_topic: str, db: Session = Depends(get_db)):
+#     return "FIX THIS"
 
 @app.post("/process_text")
 async def process_text(content: TextInput, url: TextInput, page_type: TextInput, db: Session = Depends(get_db)):
@@ -216,21 +276,65 @@ async def process_text(content: TextInput, url: TextInput, page_type: TextInput,
 
     # filter all non-alphanumeric characters
     content.text = re.sub(r'[^A-Za-z0-9(),./;:\'"\[\]{}_-]', ' ', content.text)
-   
-    print("content.text:", content.text)
-    return "FIX THIS"
 
-@app.get("/choosing_endpoint")
-async def choosing_endpoint(user_question: str = None, db: Session = Depends(get_db)):
-    return "FIX THIS"
+    nlp = initialize_nlp_pipeline()
+    doc = nlp(content.text)
+    sentences = list(doc.sents)
+    sentences = [str(sentences) for sentences in sentences]
+    chunk_size = 5
+    sentence_chunks = split_into_chunks(sentences, chunk_size)
+
+    documents = []
+    for chunk in sentence_chunks:
+        joined_chunk = "".join(chunk).replace("  ", " ").strip()
+        joined_chunk = re.sub(r'\.([A-Z])', r'. \1', joined_chunk)
+        documents.append(joined_chunk)
+
+    topic_model, embedding_model = initialize_models()
+    embeddings = embedding_model.encode(documents)
+    topics, _ = topic_model.fit_transform(documents, embeddings)
+    all_topic_names = set([topic.name for topic in get_all_topics(db)])
+    print("Getting topic number and keywords")
+    topic_keywords = get_topic_number_and_keywords(topic_model)
+    print("Getting topics taxonomy")
+    taxonomy = get_topics_taxonomy(all_topic_names, topic_keywords, API_KEY)
+    formatted_list = format_json_string(taxonomy)
+    topic_keywords, identity, keywords_layer = generate_keywords_and_topic_identity(formatted_list)
+    print("Storing topics in db")
+    store_topics_in_db(db, topic_keywords, all_topic_names)
+    new_all_topics = get_all_topics(db)
+    new_all_topic_names = set([topic.name for topic in new_all_topics])
+    store_connections_in_db(db, keywords_layer, new_all_topic_names, new_all_topics)
+    print("Storing sources in db")
+    reduced_embeddings = UMAP(n_neighbors=3, n_components=2, min_dist=0.0, metric='cosine', random_state=42).fit_transform(embeddings)
+    data = store_sources_in_db(db, documents, topics, embeddings, reduced_embeddings, identity, url.text, page_type.text)
+
+    # Store URL in websites table if it doesn't exist
+    existing_website = db.query(models.Websites).filter(models.Websites.url == url.text).first()
+
+    if not existing_website:
+        new_website = models.Websites(url=url.text, content=content.text, page_type=page_type.text)
+        db.add(new_website)
+        db.commit()
+        db.refresh(new_website)
+    print("Successfully added source to Memoir")
+    return {"message": data}
+
+def get_all_topics(db: Session = Depends(get_db)):
+    db_topics = db.query(models.Topics).all()
+    return db_topics
+
+def get_all_connections(db: Session = Depends(get_db)):
+    db_connections = db.query(models.Connections).all()
+    return db_connections
 
 @app.get("/get_all_topics")
-async def get_all_topics(db: Session = Depends(get_db)):
+async def get_all_topics_request(db: Session = Depends(get_db)):
     db_topics = db.query(models.Topics).all()
     return db_topics
 
 @app.get("/get_all_connections")
-async def get_all_connections(db: Session = Depends(get_db)):
+async def get_all_connections_request(db: Session = Depends(get_db)):
     db_connections = db.query(models.Connections).all()
     return db_connections
 
@@ -241,11 +345,11 @@ async def get_all_sources(db: Session = Depends(get_db)):
     data = []
     for source in db_sources:
         source_dict = {
-            "id": source.id, 
-            "topic_id": source.topic_id, 
-            "vector_2d": source.vector_2d.tolist() if hasattr(source.vector_2d, 'tolist') else source.vector_2d, 
-            "url": source.url, 
-            "page_type": source.page_type, 
+            "id": source.id,
+            "topic_id": source.topic_id,
+            "vector_2d": source.vector_2d.tolist() if hasattr(source.vector_2d, 'tolist') else source.vector_2d,
+            "url": source.url,
+            "page_type": source.page_type,
             "content": source.content
         }
         data.append(source_dict)

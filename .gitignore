@@ -1,4 +1,4 @@
-backend/.env
+backend/src/.env
 backend/.venv
 
 # Byte-compiled / optimized / DLL files

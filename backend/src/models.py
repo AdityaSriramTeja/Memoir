@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint, Text
 from sqlalchemy.dialects.postgresql import insert
 from database import Base
 from pgvector.sqlalchemy import Vector
@@ -33,5 +33,5 @@ class Websites(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     url = Column(String, index=True, unique=True)
-    content = Column(String, index=True)
+    content = Column(Text)
     page_type = Column(String, index=True)
